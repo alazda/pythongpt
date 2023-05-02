@@ -1,7 +1,12 @@
 import openai
 import os
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+with open('./' + 'openai_key.txt', 'r') as f:
+    api_key = f.read().strip()
+
+openai.api_key = api_key
+
+print(openai.api_key)
 
 def complete(text, _model, num_tokens, callback):
     response = openai.Completion.create(model=_model, prompt=text, max_tokens = num_tokens)
