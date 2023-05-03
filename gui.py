@@ -1,15 +1,17 @@
 from transformers import GPT2Tokenizer
 import request as rq
 import tkinter as tk
+from document import *
 
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
 start_send = "1.0"
 
-docs_content = {"new" : "habba dabba", "new(1)" : "ragga doo da"}
-curr_doc = "new"
+start_doc = Document("new", "", Settings("curie", 1, 1, True))
 
-use_max_tokens = True
+docs = [start_doc]
+
+curr_doc = 0
 
 #scripts
 def on_callback(answer):
@@ -144,11 +146,13 @@ def new_document() :
 def load_doc() :
     text.insert("1.0", docs_content[curr_doc])
 
-#building the gui
-window = tk.Tk()
+#-------------building the gui
 
-bottom_frame = tk.Frame(window)
-left_frame = tk.Frame(window)
+root = tk.Tk()
+
+bottom_frame = tk.Frame(root)
+left_frame = tk.Frame(root)
+
 bottom_frame.pack(side = tk.BOTTOM)
 left_frame.pack(side = tk.LEFT)
 
@@ -162,11 +166,15 @@ text = tk.Text(
     height=30
 )
 
+#making the doc tabs
+
 dlistnames = ["new", "new(1)"]
 
 doc_list = tk.Variable(value=dlistnames)
 
 document_selector = tk.Listbox(left_frame, height = 5, listvariable=doc_list)
+
+#---
 
 text.tag_add("tokens_using", start_send, tk.END)
 
@@ -216,4 +224,4 @@ button.pack()
 
 load_doc()
 
-window.mainloop()
+root.mainloop()
