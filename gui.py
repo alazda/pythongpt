@@ -6,6 +6,9 @@ tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
 start_send = "1.0"
 
+docs_content = {"new" : "habba dabba", "new(1)" : "ragga doo da"}
+curr_doc = "new"
+
 use_max_tokens = True
 
 #scripts
@@ -26,10 +29,6 @@ def update_tokens(event):
     #print(to_tokenize)
 
     tokens = tokenizer.encode(to_tokenize)
-
-
-
-
 
     token_strings = [tokenizer.decode(token) for token in tokens]
 
@@ -53,8 +52,6 @@ def update_tokens(event):
 
     #total characters in the text
     char_count = len(text.get("1.0", tk.END))
-
-    #print("chars total: " + str(char_count))
 
     token_start_index = char_count
 
@@ -100,13 +97,52 @@ def change_tokens_use(event) :
 
     update_tokens(event)
 
+def save_curr_doc() : 
+    doc_text = text.get("1.0", tk.END)
+    docs_content[curr_doc] = doc_text
+
 def change_document(event) :
-    document_list.get()
+    save_curr_doc()
+
+    selected_name = get_selected_doc_name()
+
+    text.delete("1.0", tk.END)
+
+    text.insert("1.0", docs_content[selected_name])
+
+    global curr_doc
+
+    curr_doc = selected_name
     return
 
+def get_selected_doc_name() :
+    sname = document_selector.get(document_selector.curselection())
+    print(" doc name: " + sname)
+    return sname
+
 def new_document() :
-    d_list.append("another")
-    documents.set(d_list)
+    save_curr_doc()
+
+    new_doc_name = "new(1)"
+
+    for i in range(1, 100):
+        key = "new(" + str(i) + ")"
+        if key in docs_content :
+            continue
+        else :
+            new_doc_name = key
+            break
+
+    docs_content[new_doc_name] = "well, it worked, you fool!"
+    litems = list(doc_list.get())
+    litems.append(new_doc_name)
+    doc_list.set(litems)
+    global curr_doc 
+    curr_doc = new_doc_name
+    return
+
+def load_doc() :
+    text.insert("1.0", docs_content[curr_doc])
 
 #building the gui
 window = tk.Tk()
@@ -126,11 +162,11 @@ text = tk.Text(
     height=30
 )
 
-d_list = ["new"]
+dlistnames = ["new", "new(1)"]
 
-documents = tk.Variable(value=d_list)
+doc_list = tk.Variable(value=dlistnames)
 
-document_list = tk.Listbox(left_frame, height = 5, listvariable=documents)
+document_selector = tk.Listbox(left_frame, height = 5, listvariable=doc_list)
 
 text.tag_add("tokens_using", start_send, tk.END)
 
@@ -145,8 +181,8 @@ newbutton = tk.Button(left_frame,
 button = tk.Button(bottom_frame,
     command = send_for_completion,
     text="Send",
-    width = 10,
-    height = 3,
+    width = 6,
+    height = 2,
 )
 
 
@@ -165,17 +201,19 @@ tokens_retrieve.pack(side = tk.RIGHT)
 #event handlers
 tokens_use.bind("<B1-Motion>", change_tokens_use)
 text.bind("<KeyRelease>", update_tokens)
-document_list.bind("<<ListboxSelect>>", change_document)
+document_selector.bind("<<ListboxSelect>>", change_document)
 
 #packing
 
 newbutton.pack()
-document_list.pack()
+document_selector.pack()
 
 token_count_label.pack()
 text.pack()
 tokens_use.pack()
 
 button.pack()
+
+load_doc()
 
 window.mainloop()
