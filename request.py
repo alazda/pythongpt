@@ -16,3 +16,7 @@ def complete(text, _model, num_tokens, callback):
 def chat(history, _model, num_tokens, callback):
     response = openai.ChatCompletion.create(model = _model, messageSs = history, max_tokens = num_tokens)
     callback(response)
+
+def create_embedding(text, _model, callback):
+    response = openai.Embedding.create(model = _model, input = text)
+    callback(response)
