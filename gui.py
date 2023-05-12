@@ -1,7 +1,7 @@
 from transformers import GPT2Tokenizer
 import request as rq
-import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import *
+from tkinter.ttk import *
 from document import *
 import theme as th
 import os
@@ -51,20 +51,20 @@ def update_theme() :
 #sending to the api
 
 def on_callback(answer):
-    c_text.tag_remove("last_sent", "1.0", tk.END)
-    c_text.insert(tk.END, answer, "last_sent")
+    c_text.tag_remove("last_sent", "1.0", END)
+    c_text.insert(END, answer, "last_sent")
     update_tokens(answer)
     c_text.tag_config("last_sent", foreground=theme.last_sent_colour, rmargin=0)
 
 def send_for_completion():
-    text_to_send = c_text.get(start_send, tk.END).removesuffix("\n")
+    text_to_send = c_text.get(start_send, END).removesuffix("\n")
     print("Sending: '" + text_to_send + "'")
     answer = rq.complete(text_to_send, model.get(), tokens_retrieve.get(), on_callback)
 
 def resend_for_completion():
     remove_last_sent_text()
     update_tokens("")
-    text_to_send = c_text.get(start_send, tk.END).removesuffix("\n")
+    text_to_send = c_text.get(start_send, END).removesuffix("\n")
     print("Sending: '" + text_to_send + "'")
     answer = rq.complete(text_to_send, model.get(), tokens_retrieve.get(), on_callback)
 
@@ -123,7 +123,7 @@ def update_tokens(event):
     change_highlighted(tk_pos)
 
 def remove_highlighted() :
-    c_text.tag_remove("tokens_using", "1.0", tk.END)
+    c_text.tag_remove("tokens_using", "1.0", END)
 
 def change_highlighted(new_start_index) :
 
@@ -167,7 +167,7 @@ def change_model(event) :
 
 #because tkinter is a b
 def get_all_text() :
-    return c_text.get("1.0", tk.END).removesuffix("\n")
+    return c_text.get("1.0", END).removesuffix("\n")
 
 #-----saving and loading documents
 
@@ -190,7 +190,7 @@ def new_document() :
 
     docs.append(new_doc)
 
-    document_selector.insert(tk.END, new_doc.name)
+    document_selector.insert(END, new_doc.name)
 
     load_doc(len(docs) - 1)
     return
@@ -207,9 +207,9 @@ def load_doc(index) :
 
     start_send = "1.0"
 
-    c_text.delete("1.0", tk.END)
+    c_text.delete("1.0", END)
     c_text.insert("1.0", current_doc.text)
-    c_text.delete(tk.END + "-1c")
+    c_text.delete(END + "-1c")
 
     update_tokens(None)
 
@@ -233,9 +233,9 @@ def save_to_file() :
 
 def save_as_to_file() :
 
-    #filedialogue = tk.filedialog
+    #filedialogue = .filedialog
 
-    filename = tk.filedialog.asksaveasfilename(initialdir = "./save/", title = "Select file", filetypes = (("text files","*.txt"),("all files","*.*")))
+    filename = filedialog.asksaveasfilename(initialdir = "./save/", title = "Select file", filetypes = (("text files","*.txt"),("all files","*.*")))
 
     with open(filename, "w") as f:
         f.write(get_all_text())
@@ -258,9 +258,9 @@ def get_installed_fonts():
 
     return fonts
 
-root = tk.Tk()
+root = Tk()
 
-font = tk.Variable(root, ("Courier", 12))
+font = Variable(root, ("Courier", 12))
 
 root.columnconfigure(0, minsize = 100)
 root.columnconfigure(1, weight= 5)
@@ -271,20 +271,20 @@ root.rowconfigure(1, weight = 5)
 root.rowconfigure(2, minsize= 50)
 
 
-bottom_frame = tk.Frame(root)
-left_frame = tk.Frame(root)
-text_frame = tk.Frame(root)
+bottom_frame = Frame(root)
+left_frame = Frame(root)
+text_frame = Frame(root)
 
 bottom_frame.grid(column=1,row=2, sticky="s")
 left_frame.grid(column=0, row=1, sticky="w")
 text_frame.grid(column=1, row=1, sticky="nsew")   
 
-token_count_label = tk.Label()
+token_count_label = Label()
 
-c_text = tk.Text(
+c_text = Text(
     text_frame,
     font = font,
-    wrap=tk.WORD,
+    wrap=WORD,
     foreground='black',
     background='white',
 )
@@ -293,49 +293,49 @@ c_text = tk.Text(
 
 
 
-document_selector = tk.Listbox(left_frame, height = 10)
+document_selector = Listbox(left_frame, height = 10)
 
 document_selector.bind("<<ListboxSelect>>", change_document)
 
 for _doc in docs :
-    document_selector.insert(tk.END, _doc.name)
+    document_selector.insert(END, _doc.name)
 
 #---
 
-c_text.tag_add("tokens_using", start_send, tk.END)
-c_text.tag_add("last_sent", tk.END, tk.END)
+c_text.tag_add("tokens_using", start_send, END)
+c_text.tag_add("last_sent", END, END)
 
 
 
-new_doc_button = tk.Button(left_frame,
+new_doc_button = Button(left_frame,
     command = new_document,
     text="+",
     width = 3,
     height = 1,
 )
 
-send_button = tk.Button(bottom_frame,
+send_button = Button(bottom_frame,
     command = send_for_completion,
     text="Send",
     width = 6,
     height = 2,
 )
 
-resend_button = tk.Button(bottom_frame,
+resend_button = Button(bottom_frame,
     command = resend_for_completion,
     text="Resend",
     width = 6,
     height = 2,
 )
 
-save_button = tk.Button(left_frame,
+save_button = Button(left_frame,
     command = save_to_file,
     text="Save",
     width = 6,
     height = 2,
 )
 
-save_as_button = tk.Button(left_frame,
+save_as_button = Button(left_frame,
     command = save_as_to_file,
     text="Save As",
     width = 3,
@@ -351,9 +351,9 @@ def open_options():
 def close_options_window(): 
     options_window.withdraw()  
 
-options_button = tk.Button(root, text="Options", command=open_options)
+options_button = Button(root, text="Options", command=open_options)
 
-options_window = tk.Toplevel(root)
+options_window = Toplevel(root)
 
 options_window.geometry("200x200")
 
@@ -367,7 +367,7 @@ themes = []
 
 path = "./themes/"
 
-theme_selected = tk.StringVar(options_window)
+theme_selected = StringVar(options_window)
 
 theme_selected.set("Default")
 
@@ -376,7 +376,7 @@ for theme_p in os.listdir(path):
     if os.path.isfile(os.path.join(path, theme_p)):
         themes.append(theme_p.split(".")[0])
 
-theme_menu = tk.OptionMenu(options_window, theme_selected, *themes)
+theme_menu = OptionMenu(options_window, theme_selected, *themes)
 
 theme_menu.bind("<<OptionMenuSelect>>", change_theme)
 
@@ -390,26 +390,26 @@ options_window.withdraw()
 
 model_strings = list(models.keys())
 
-model = tk.StringVar(bottom_frame)
+model = StringVar(bottom_frame)
 
 model.set("curie")
 
-model_select = tk.OptionMenu(bottom_frame, model, *model_strings, command = change_model)
+model_select = OptionMenu(bottom_frame, model, *model_strings, command = change_model)
 
-send_button.pack(side=tk.RIGHT)
+send_button.pack(side=RIGHT)
 
-resend_button.pack(side=tk.RIGHT)
+resend_button.pack(side=RIGHT)
 
 #token scales
 
 #this is the slider to indicate how many of the tokens in the document should be sent off
-num_tokens_use = tk.Scale(bottom_frame, from_=1, to=1, orient=tk.HORIZONTAL)
-num_tokens_use.pack(side = tk.RIGHT)
+num_tokens_use = Scale(bottom_frame, from_=1, to=1, orient=HORIZONTAL)
+num_tokens_use.pack(side = RIGHT)
 
 
 #this is the slider of how many tokens the user wants to get back
-tokens_retrieve = tk.Scale(bottom_frame, from_=1, to=models[model.get()], orient=tk.HORIZONTAL)
-tokens_retrieve.pack(side = tk.RIGHT)
+tokens_retrieve = Scale(bottom_frame, from_=1, to=models[model.get()], orient=HORIZONTAL)
+tokens_retrieve.pack(side = RIGHT)
 
 #event handlers
 num_tokens_use.bind("<B1-Motion>", change_tokens_use)
